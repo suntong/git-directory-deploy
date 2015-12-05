@@ -63,14 +63,6 @@ main() {
 		return 1
 	fi
 
-	if git ls-remote --exit-code $repo "refs/heads/$deploy_branch" ; then
-		# deploy_branch exists in $repo; make sure we have the latest version
-		
-		disable_expanded_output
-		git fetch --force $repo $deploy_branch:$deploy_branch
-		enable_expanded_output
-	fi
-
 	# check if deploy_branch exists locally
 	if git show-ref --verify --quiet "refs/heads/$deploy_branch"
 	then incremental_deploy
