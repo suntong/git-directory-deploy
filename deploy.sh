@@ -5,10 +5,6 @@ main() {
 	deploy_directory=${GIT_DEPLOY_DIR:-dist}
 	deploy_branch=${GIT_DEPLOY_BRANCH:-gh-pages}
 
-	#if no user identity is already set in the current git environment, use this:
-	default_username=${GIT_DEPLOY_USERNAME:-deploy.sh}
-	default_email=${GIT_DEPLOY_EMAIL:-}
-
 	#repository to deploy to. must be readable and writable.
 	repo=${GIT_DEPLOY_REPO:-origin}
 	
@@ -111,7 +107,6 @@ incremental_deploy() {
 }
 
 commit+push() {
-	set_user_id
 	git --work-tree "$deploy_directory" commit -m "$commit_message"
 
 	disable_expanded_output
@@ -133,15 +128,6 @@ disable_expanded_output() {
 	if [ $verbose ]; then
 		set +o xtrace
 		set -o verbose
-	fi
-}
-
-set_user_id() {
-	if [[ -z `git config user.name` ]]; then
-		git config user.name "$default_username"
-	fi
-	if [[ -z `git config user.email` ]]; then
-		git config user.email "$default_email"
 	fi
 }
 
