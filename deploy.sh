@@ -68,8 +68,6 @@ main() {
 	then incremental_deploy
 	else initial_deploy
 	fi
-
-	restore_head
 }
 
 initial_deploy() {
@@ -121,17 +119,6 @@ disable_expanded_output() {
 		set +o xtrace
 		set -o verbose
 	fi
-}
-
-restore_head() {
-	if [[ $previous_branch = "HEAD" ]]; then
-		#we weren't on any branch before, so just set HEAD back to the commit it was on
-		git update-ref --no-deref HEAD $commit_hash $deploy_branch
-	else
-		git symbolic-ref HEAD refs/heads/$previous_branch
-	fi
-	
-	git reset --mixed
 }
 
 filter() {
