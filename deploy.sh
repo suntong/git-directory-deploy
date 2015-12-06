@@ -63,11 +63,21 @@ main() {
 		return 1
 	fi
 
+	if git ls-remote --exit-code $repo "refs/heads/$deploy_branch" ; then
+		# deploy_branch exists in $repo; make sure we have the latest version
+		
+		disable_expanded_output
+		git fetch --force $repo $deploy_branch:$deploy_branch
+		enable_expanded_output
+	fi
+
 	# check if deploy_branch exists locally
 	if git show-ref --verify --quiet "refs/heads/$deploy_branch"
 	then incremental_deploy
 	else initial_deploy
 	fi
+
+	restore_head
 }
 
 initial_deploy() {
@@ -119,6 +129,17 @@ disable_expanded_output() {
 		set +o xtrace
 		set -o verbose
 	fi
+}
+
+restore_head() {
+	if [[ $previous_branch = "HEAD" ]]; then
+		#we weren't on any branch before, so just set HEAD back to the commit it was on
+		git update-ref --no-deref HEAD $commit_hash $deploy_branch
+	else
+		git symbolic-ref HEAD refs/heads/$previous_branch
+	fi
+	
+	git reset --mixed
 }
 
 filter() {
